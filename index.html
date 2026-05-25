@@ -154,7 +154,7 @@
   <main class="page">
     <section id="startScreen" class="card">
       <h1>高二下生物・生態系雙人搶答對戰</h1>
-      <p>輸入雙方名字後開始，先作答者為玩家1。每人 30 秒，答對自動下一題，答錯顯示解說後手動繼續。</p>
+      <p>輸入雙方名字後開始，先作答者為玩家1。每人 60 秒，答對自動下一題，答錯顯示解說後手動繼續。</p>
       <div class="input-row">
         <div>
           <label for="player1Name">玩家 1 名字</label>
@@ -180,11 +180,11 @@
       <div class="flex">
         <div class="timer-box" id="timerBox1">
           <div class="timer-title" id="timerLabel1">玩家1 剩餘時間</div>
-          <div class="timer-value" id="timerValue1">30</div>
+          <div class="timer-value" id="timerValue1">60</div>
         </div>
         <div class="timer-box" id="timerBox2">
           <div class="timer-title" id="timerLabel2">玩家2 剩餘時間</div>
-          <div class="timer-value" id="timerValue2">30</div>
+          <div class="timer-value" id="timerValue2">60</div>
         </div>
       </div>
 
@@ -282,8 +282,8 @@
 
     const state = {
       players: [
-        {name: '', timer: 30, correct: 0, total: 0, score: 0, streak: 0, maxStreak: 0, sectionStats: {}, details: []},
-        {name: '', timer: 30, correct: 0, total: 0, score: 0, streak: 0, maxStreak: 0, sectionStats: {}, details: []}
+        {name: '', timer: 60, correct: 0, total: 0, score: 0, streak: 0, maxStreak: 0, sectionStats: {}, details: []},
+        {name: '', timer: 60, correct: 0, total: 0, score: 0, streak: 0, maxStreak: 0, sectionStats: {}, details: []}
       ],
       currentPlayer: 0,
       questionOrder: [],
@@ -332,8 +332,8 @@
 
     function resetState() {
       state.players = [
-        {name: '', timer: 30, correct: 0, total: 0, score: 0, streak: 0, maxStreak: 0, sectionStats: {}, details: []},
-        {name: '', timer: 30, correct: 0, total: 0, score: 0, streak: 0, maxStreak: 0, sectionStats: {}, details: []}
+        {name: '', timer: 60, correct: 0, total: 0, score: 0, streak: 0, maxStreak: 0, sectionStats: {}, details: []},
+        {name: '', timer: 60, correct: 0, total: 0, score: 0, streak: 0, maxStreak: 0, sectionStats: {}, details: []}
       ];
       state.currentPlayer = 0;
       state.questionOrder = shuffle(questions);
@@ -391,7 +391,7 @@
       const current = state.currentPlayer;
       if (current === 0) {
         switchTitle.textContent = '時間到！換玩家 2';
-        switchBody.textContent = `${state.players[0].name} 的 30 秒已結束，現在由 ${state.players[1].name} 接續。`;
+        switchBody.textContent = `${state.players[0].name} 的 60 秒已結束，現在由 ${state.players[1].name} 接續。`;
         switchBtn.textContent = '準備好，開始！';
       } else {
         switchTitle.textContent = '遊戲結束！';
