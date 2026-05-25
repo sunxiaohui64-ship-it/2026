@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>高二下生物・生態系單元搶答對戰</title>
+  <style>
+    :root {
+      --bg: #0b1620;
+      --card: #111f2d;
+      --text: #e7f1ff;
+      --muted: #9bb4d3;
+      --accent: #55c2ff;
+      --success: #4edf8a;
+      --danger: #ff6b6b;
+      --warning: #ffb545;
+      --shadow: 0 18px 50px rgba(0,0,0,.22);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Noto Sans TC", system-ui, sans-serif;
+      background: radial-gradient(circle at top left, #183b5d 0%, #0b1620 45%);
+      color: var(--text);
+    }
+    .page {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+    .card {
+      background: var(--card);
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: 20px;
+      box-shadow: var(--shadow);
+      padding: 24px;
+      margin-bottom: 24px;
+    }
+    h1, h2, h3, h4 { margin: 0 0 16px; }
+    .input-row {
+      display: grid;
+      gap: 16px;
+      grid-template-columns: repeat(auto-fit,minmax(220px,1fr));
+      margin-bottom: 24px;
+    }
+    input, button, select {
+      width: 100%;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.04);
+      color: var(--text);
+      padding: 14px 16px;
+      font-size: 1rem;
+    }
+    button {
+      cursor: pointer;
+      border: none;
+      transition: transform .15s ease, background .15s ease;
+    }
+    button:hover { transform: translateY(-1px); }
+    .btn-primary { background: linear-gradient(135deg,#3fd1ff,#4c8cff); color:#fff; }
+    .btn-secondary { background: rgba(255,255,255,.08); color: var(--text); }
+    .btn-warning { background: linear-gradient(135deg,#ffb545,#f97d25); color:#111; }
+    .btn-danger { background: linear-gradient(135deg,#ff6b6b,#d92f57); color:#fff; }
+    .center { text-align: center; }
+    .flex { display: flex; gap: 16px; flex-wrap: wrap; }
+    .stretch { flex: 1; }
+    .timer-box {
+      border: 1px solid rgba(255,255,255,.16);
+      border-radius: 18px;
+      padding: 18px;
+      min-width: 180px;
+      flex: 1;
+      background: rgba(255,255,255,.02);
+    }
+    .timer-box.active { border-color: var(--accent); box-shadow: 0 0 20px rgba(85,194,255,.18); }
+    .timer-title { font-size: .9rem; color: var(--muted); margin-bottom: 8px; }
+    .timer-value { font-size: 2.4rem; font-weight: 700; letter-spacing: .05em; }
+    .question-panel { margin-top: 16px; }
+    .question-tag {
+      display: inline-flex;
+      gap: 8px;
+      align-items: center;
+      font-size: .9rem;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.04);
+      color: var(--accent);
+      margin-bottom: 14px;
+    }
+    .question-text { font-size: 1.2rem; line-height: 1.7; margin-bottom: 18px; }
+    .choices { display: grid; gap: 12px; }
+    .choice-btn {
+      text-align: left;
+      min-height: 62px;
+      padding: 18px 16px;
+      border-radius: 16px;
+      background: rgba(255,255,255,.04);
+      color: var(--text);
+      transition: background .15s ease, transform .15s ease;
+    }
+    .choice-btn:hover { background: rgba(255,255,255,.08); }
+    .choice-btn.correct { background: rgba(78,223,138,.18); border: 1px solid rgba(78,223,138,.32); }
+    .choice-btn.wrong { background: rgba(255,107,107,.18); border: 1px solid rgba(255,107,107,.32); }
+    .feedback { margin-top: 18px; padding: 16px 18px; border-radius: 16px; background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.08); }
+    .feedback strong { display:block; margin-bottom: 8px; }
+    .feedback .explanation { color: var(--muted); line-height: 1.75; }
+    .notice { display: inline-flex; gap: 10px; align-items: center; padding: 12px 16px; border-radius: 16px; background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.1); margin-top: 16px; }
+    .notice span { font-weight: 700; }
+    .hidden { display: none; }
+    .section-summary { display: grid; grid-template-columns: repeat(auto-fit,minmax(180px,1fr)); gap: 14px; }
+    .section-card {
+      padding: 14px 16px;
+      border-radius: 16px;
+      background: rgba(255,255,255,.05);
+      border: 1px solid rgba(255,255,255,.08);
+    }
+    .section-card.weak { border-color: rgba(255,107,107,.6); background: rgba(255,107,107,.1); }
+    .detail-row { display: grid; grid-template-columns: 1fr auto; gap: 16px; align-items: center; }
+    .detail-row div { min-width: 0; }
+    .detail-item { margin-bottom: 14px; }
+    .detail-box { padding: 16px; border-radius: 18px; background: rgba(255,255,255,.03); border: 1px solid rgba(255,255,255,.08); }
+    .detail-box p { margin: 8px 0; line-height: 1.6; }
+    .detail-box .label { font-size: .85rem; color: var(--muted); }
+    .result-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+    .result-table th, .result-table td {
+      border: 1px solid rgba(255,255,255,.08);
+      padding: 12px 14px;
+      text-align: left;
+    }
+    .result-table th { background: rgba(255,255,255,.04); }
+    .result-table tr:nth-child(even) { background: rgba(255,255,255,.02); }
+    .detail-list { margin-top: 20px; display: grid; gap: 12px; }
+    .detail-card {
+      padding: 16px;
+      border-radius: 18px;
+      background: rgba(255,255,255,.04);
+      border: 1px solid rgba(255,255,255,.08);
+    }
+    .detail-card .title { font-weight: 700; margin-bottom: 8px; }
+    .result-badge { padding: 4px 10px; border-radius: 999px; font-size: .84rem; }
+    .badge-correct { background: rgba(78,223,138,.18); color: #9df2be; }
+    .badge-wrong { background: rgba(255,107,107,.18); color: #ffb6b6; }
+    .prompt-box { margin-top: 16px; padding: 18px; border-radius: 18px; background: rgba(85,194,255,.08); border: 1px solid rgba(85,194,255,.18); }
+    .prompt-box code { display: block; white-space: pre-wrap; word-break: break-word; color:#eef6ff; }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <section id="startScreen" class="card">
+      <h1>高二下生物・生態系雙人搶答對戰</h1>
+      <p>輸入雙方名字後開始，先作答者為玩家1。每人 30 秒，答對自動下一題，答錯顯示解說後手動繼續。</p>
+      <div class="input-row">
+        <div>
+          <label for="player1Name">玩家 1 名字</label>
+          <input type="text" id="player1Name" placeholder="玩家1" />
+        </div>
+        <div>
+          <label for="player2Name">玩家 2 名字</label>
+          <input type="text" id="player2Name" placeholder="玩家2" />
+        </div>
+      </div>
+      <button id="startBtn" class="btn-primary">開始遊戲</button>
+    </section>
+
+    <section id="gameScreen" class="card hidden">
+      <div class="detail-row">
+        <div>
+          <h2 id="gameStage">第 1 回合：玩家1作答</h2>
+          <p id="gameHint">答對將在 0.45 秒後自動切題，答錯會顯示解說後點「下一題」。</p>
+        </div>
+        <button id="resetBtn" class="btn-secondary">重新開始</button>
+      </div>
+
+      <div class="flex">
+        <div class="timer-box" id="timerBox1">
+          <div class="timer-title" id="timerLabel1">玩家1 剩餘時間</div>
+          <div class="timer-value" id="timerValue1">30</div>
+        </div>
+        <div class="timer-box" id="timerBox2">
+          <div class="timer-title" id="timerLabel2">玩家2 剩餘時間</div>
+          <div class="timer-value" id="timerValue2">30</div>
+        </div>
+      </div>
+
+      <div class="question-panel card" id="questionPanel">
+        <div class="question-tag" id="sectionTag"></div>
+        <div class="question-text" id="questionText"></div>
+        <div class="choices" id="choices"></div>
+        <div id="feedback" class="feedback hidden"></div>
+        <button id="nextBtn" class="btn-warning hidden">下一題</button>
+        <div class="notice hidden" id="streakNotice"><span>🔥</span><span id="streakText"></span></div>
+      </div>
+    </section>
+
+    <section id="switchScreen" class="card hidden center">
+      <h2 id="switchTitle">時間到！</h2>
+      <p id="switchBody">準備切換到下一位玩家。</p>
+      <button id="switchBtn" class="btn-primary">繼續</button>
+    </section>
+
+    <section id="resultScreen" class="card hidden">
+      <div class="detail-row">
+        <div>
+          <h2 id="resultTitle">遊戲結果</h2>
+          <p id="resultSummary"></p>
+        </div>
+        <button id="playAgainBtn" class="btn-primary">再來一局</button>
+      </div>
+
+      <div class="flex" style="margin-top:16px;">
+        <div class="detail-box stretch">
+          <h3>玩家統計</h3>
+          <table class="result-table">
+            <thead>
+              <tr><th>玩家</th><th>答對</th><th>總題數</th><th>正確率</th><th>分數</th></tr>
+            </thead>
+            <tbody id="resultTableBody"></tbody>
+          </table>
+        </div>
+        <div class="detail-box stretch">
+          <h3>弱點章節</h3>
+          <div id="weakSectionList" class="section-summary"></div>
+        </div>
+      </div>
+
+      <div class="detail-box" style="margin-top:24px;">
+        <h3>按鈕：AI 解說 / 弱點分析</h3>
+        <div class="flex" style="flex-wrap: wrap; gap:12px; margin-top:14px;">
+          <button id="sendWrongBtn" class="btn-secondary">錯題 AI 解說</button>
+          <button id="sendWeakBtn" class="btn-secondary">弱點章節分析</button>
+        </div>
+        <div id="promptBox" class="prompt-box hidden">
+          <p class="label">已建立 sendPrompt 提示內容：</p>
+          <code id="promptContent"></code>
+        </div>
+      </div>
+
+      <div class="detail-box" style="margin-top:24px;">
+        <h3>逐題詳解</h3>
+        <div id="detailList" class="detail-list"></div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const questions = [
+      {section: '族群與群落', question: '生態系中的 K 值代表什麼？', choices: ['族群的最大繁殖力', '族群的環境承載力', '物種的競爭優勢', '種群的演替階段'], answer: 1, explanation: 'K 值為環境所能長期支持的最大族群數量，亦稱環境承載力。'},
+      {section: '族群與群落', question: 'S 型族群成長曲線的特徵是？', choices: ['無限制指數成長', '初期緩慢、中期快速、後期趨於穩定', '持續衰退', '季節性波動'], answer: 1, explanation: 'S 型曲線表示族群在資源有限下，初期緩慢增長，中期快速，最後趨於 K 值穩定。'},
+      {section: '族群與群落', question: '標放再捕法常用於估算什麼？', choices: ['物種多樣性', '族群大小', '食物鏈長度', '棲地面積'], answer: 1, explanation: '標放再捕法可利用已標示個體再捕獲比例，推估族群總數。'},
+      {section: '族群與群落', question: '「優勢種」通常指的是？', choices: ['數量最多，且對群落影響最大', '最稀少的物種', '入侵物種', '只出現在頂極群落'], answer: 0, explanation: '優勢種為數量多、體重大或生態影響力大，對群落結構與能量流動影響深遠。'},
+      {section: '生物交互作用', question: '互利關係的特徵是？', choices: ['雙方皆受益', '一方受益，一方無損', '一方受益，一方受害', '雙方皆受害'], answer: 0, explanation: '互利關係中雙方都從互動中獲益，例如牛與瘧原蟲。'},
+      {section: '生物交互作用', question: '片利關係的正確例子是？', choices: ['懸鉤子吸附動物', '牛與瘧原蟲', '花與蜜蜂', '寄生蜂與害蟲'], answer: 0, explanation: '片利關係是一方受益，另一方無顯著影響，例如懸鉤子附著於動物。'},
+      {section: '生物交互作用', question: '寄生關係的關鍵是？', choices: ['寄主受到傷害', '雙方共生', '無互動', '只發生在植物間'], answer: 0, explanation: '寄生關係中寄生者受益，寄主受害，例如瘧原蟲寄生人體。'},
+      {section: '生物交互作用', question: '競爭排除原則說明？', choices: ['兩物種不能共存於同一生態位', '捕食者會排除獵物', '寄生者壓抑宿主繁殖', '互利共生會消失'], answer: 0, explanation: '競爭排除原則指兩物種若佔據相同生態位、資源有限，則其中一方必被排除或轉移。'},
+      {section: '生物交互作用', question: '捕食振盪模型常見於？', choices: ['捕食者與獵物族群數量隨時間交互波動', '互利共生族群穩定', '植食者數量持續下降', '物種演替的開始'], answer: 0, explanation: '捕食振盪指捕食者與獵物族群大小隨時間出現週期性波動。'},
+      {section: '能量流動', question: '林德曼 10% 定律表示？', choices: ['每階層能量減少約 90%', '10% 能量可逆流回前一階層', '食物鏈長度為 10', '生產者吸收 10% 太陽能'], answer: 0, explanation: '林德曼 10% 定律指出從一級消費者到下一級消費者，平均僅有約 10% 的能量傳遞。'},
+      {section: '能量流動', question: '食物鏈各階層稱為？', choices: ['營養階級', '生態位', '棲地類型', '能量水準'], answer: 0, explanation: '食物鏈各階層稱為營養階級，例如生產者、初級消費者、中級消費者。'},
+      {section: '能量流動', question: '物質循環與能量流動正確差異是？', choices: ['物質循環可重複使用，能量最終散失為熱', '能量可循環，物質不會被消耗', '兩者都不會改變', '能量循環比物質循環快'], answer: 0, explanation: '物質（如碳、水）在生態系內循環；能量從太陽進入後，大部分以熱散失，無法完全循環。'},
+      {section: '物質循環', question: '碳循環中先進入大氣的形式主要為？', choices: ['二氧化碳', '甲烷', '氧氣', '氮氣'], answer: 0, explanation: '碳循環中，植物光合作用吸收 CO2，而呼吸作用、燃燒等過程將 CO2 釋放回大氣。'},
+      {section: '物質循環', question: '氮固定過程將 N2 轉換為？', choices: ['可利用的氨或硝酸鹽', '氧氣', '甲烷', '二氧化碳'], answer: 0, explanation: '氮固定將大氣中的 N2 轉換成可被植物利用的氨或胺類化合物。'},
+      {section: '物質循環', question: '硝化作用是指？', choices: ['氨被轉換成硝酸鹽', '有機物被分解成氨', '硝酸鹽還原成氮氣', '二氧化碳固定成有機物'], answer: 0, explanation: '硝化作用是土壤微生物將氨先轉為亞硝酸鹽，再轉為硝酸鹽。'},
+      {section: '物質循環', question: '反硝化作用的結果是？', choices: ['硝酸鹽還原為氮氣', '氨轉化成硝酸鹽', '植物吸收氮', '固定二氧化碳'], answer: 0, explanation: '反硝化作用由細菌進行，將硝酸鹽還原回 N2，將氮釋放回大氣。'},
+      {section: '演替', question: '初級演替最典型的起始環境是？', choices: ['裸岩或新生火山岩', '已受干擾的森林', '湖泊底泥', '農田'], answer: 0, explanation: '初級演替發生在無土壤、裸岩等全新環境，如火山岩或冰川退縮後。'},
+      {section: '演替', question: '次級演替的特徵是？', choices: ['已有土壤但植被被破壞', '沒有生物存在', '從裸岩開始', '只發生在海洋'], answer: 0, explanation: '次級演替發生在已有土壤但植被被干擾的環境，如農田休耕後。'},
+      {section: '演替', question: '頂極群落通常具備？', choices: ['穩定且生物多樣性高', '剛建立的裸地', '只有單一優勢種', '持續大規模擾動'], answer: 0, explanation: '頂極群落為穩定、長期未受重大擾動、物種組成穩固的群落。'},
+      {section: '生物多樣性與應用', question: '生物多樣性的三層次為？', choices: ['基因多樣性、物種多樣性、棲地多樣性', '食物鏈、多樣性、生產力', '數量、品質、分布', '環境、族群、種群'], answer: 0, explanation: '生物多樣性分為基因、物種與棲地三個層次。'},
+      {section: '生物多樣性與應用', question: '優養化最典型的影響是？', choices: ['水體藻類暴發', '氧氣增加', '物種多樣性提高', '土壤鹽化'], answer: 0, explanation: '優養化因氮磷過度流入，導致水體藻類大量繁殖，造成缺氧。'},
+      {section: '生物多樣性與應用', question: '生物放大的意思是？', choices: ['污染物在食物鏈中濃度逐級上升', '物種數量逐層增加', '生物量遞減', '生態位縮小'], answer: 0, explanation: '生物放大是指生物體內的汙染物，如重金屬或有機污染物，在食物鏈中逐層累積、濃度上升。'},
+      {section: '生物多樣性與應用', question: '生態足跡衡量的是？', choices: ['人類對地球資源的需求', '生態系的物種數量', '森林面積變化', '大氣碳濃度'], answer: 0, explanation: '生態足跡衡量人類消耗自然資源的速度與地球可提供生產能力之間的關係。'},
+      {section: '族群與群落', question: '群落取代過程中，哪種物種最可能成為優勢種？', choices: ['生長快速且能適應環境的物種', '所有新移入物種', '最低營養階級的物種', '體型最小的物種'], answer: 0, explanation: '群落演替中，適應力強且生長快速的物種常在競爭下成為優勢種。'},
+      {section: '能量流動', question: '食物網與食物鏈的差異在於？', choices: ['食物網較複雜，顯示多種食物關係', '食物鏈只包含微生物', '食物網只有單一路徑', '食物鏈不存在能量流動'], answer: 0, explanation: '食物網整合了多條食物鏈，反映更真實複雜的生物互動。'},
+      {section: '演替', question: '演替中的旱生植物較不易存活的原因是？', choices: ['水源稀少和土壤未穩定', '空氣過於潮濕', '日照不足', '溫度過低'], answer: 0, explanation: '初級演替早期環境常水源稀少，土壤少且不穩定，使旱生植物難以定殖。'},
+      {section: '物質循環', question: '海洋中的碳循環與陸地不同，主要多了哪項過程？', choices: ['溶解 CO2 與碳酸鹽平衡', '光合作用消失', '硝化作用停止', '碳不會以有機物形式存在'], answer: 0, explanation: '海洋碳循環包含大氣 CO2 與溶解碳之間的平衡，形成碳酸鹽與生物礦物質。'},
+      {section: '生物多樣性與應用', question: '棲地多樣性重要性在於？', choices: ['提供更多生態位與生態系服務', '減少物種數量', '固定碳匯能力降低', '只影響單一物種'], answer: 0, explanation: '棲地多樣性創造更多生態位、支持更多物種與生態系功能。'}
+    ];
+
+    const state = {
+      players: [
+        {name: '', timer: 30, correct: 0, total: 0, score: 0, streak: 0, maxStreak: 0, sectionStats: {}, details: []},
+        {name: '', timer: 30, correct: 0, total: 0, score: 0, streak: 0, maxStreak: 0, sectionStats: {}, details: []}
+      ],
+      currentPlayer: 0,
+      questionOrder: [],
+      questionIndex: 0,
+      turnActive: false,
+      timerId: null,
+      awaitingNext: false,
+    };
+
+    const el = id => document.getElementById(id);
+    const startScreen = el('startScreen');
+    const gameScreen = el('gameScreen');
+    const switchScreen = el('switchScreen');
+    const resultScreen = el('resultScreen');
+    const startBtn = el('startBtn');
+    const resetBtn = el('resetBtn');
+    const switchBtn = el('switchBtn');
+    const playAgainBtn = el('playAgainBtn');
+    const player1NameInput = el('player1Name');
+    const player2NameInput = el('player2Name');
+    const gameStage = el('gameStage');
+    const timerValue1 = el('timerValue1');
+    const timerValue2 = el('timerValue2');
+    const timerBox1 = el('timerBox1');
+    const timerBox2 = el('timerBox2');
+    const sectionTag = el('sectionTag');
+    const questionText = el('questionText');
+    const choices = el('choices');
+    const feedback = el('feedback');
+    const nextBtn = el('nextBtn');
+    const streakNotice = el('streakNotice');
+    const streakText = el('streakText');
+    const switchTitle = el('switchTitle');
+    const switchBody = el('switchBody');
+    const resultTitle = el('resultTitle');
+    const resultSummary = el('resultSummary');
+    const resultTableBody = el('resultTableBody');
+    const weakSectionList = el('weakSectionList');
+    const detailList = el('detailList');
+    const sendWrongBtn = el('sendWrongBtn');
+    const sendWeakBtn = el('sendWeakBtn');
+    const promptBox = el('promptBox');
+    const promptContent = el('promptContent');
+
+    const shuffle = arr => arr.slice().sort(() => Math.random() - 0.5);
+
+    function resetState() {
+      state.players = [
+        {name: '', timer: 30, correct: 0, total: 0, score: 0, streak: 0, maxStreak: 0, sectionStats: {}, details: []},
+        {name: '', timer: 30, correct: 0, total: 0, score: 0, streak: 0, maxStreak: 0, sectionStats: {}, details: []}
+      ];
+      state.currentPlayer = 0;
+      state.questionOrder = shuffle(questions);
+      state.questionIndex = 0;
+      state.turnActive = false;
+      state.awaitingNext = false;
+      if (state.timerId) clearInterval(state.timerId);
+      updateUI();
+    }
+
+    function updateUI() {
+      timerValue1.textContent = String(state.players[0].timer).padStart(2, '0');
+      timerValue2.textContent = String(state.players[1].timer).padStart(2, '0');
+      timerBox1.classList.toggle('active', state.currentPlayer === 0 && state.turnActive);
+      timerBox2.classList.toggle('active', state.currentPlayer === 1 && state.turnActive);
+      gameStage.textContent = state.turnActive ? `第 ${state.questionIndex + 1} 題：${state.players[state.currentPlayer].name} 作答` : `等待中：${state.players[state.currentPlayer].name}`;
+    }
+
+    function startGame() {
+      const name1 = player1NameInput.value.trim() || '玩家1';
+      const name2 = player2NameInput.value.trim() || '玩家2';
+      state.players[0].name = name1;
+      state.players[1].name = name2;
+      resetState();
+      startScreen.classList.add('hidden');
+      switchScreen.classList.remove('hidden');
+      gameScreen.classList.add('hidden');
+      resultScreen.classList.add('hidden');
+      switchTitle.textContent = '準備開始！';
+      switchBody.textContent = `${state.players[0].name} 先開始，按下「繼續」進入遊戲。`;
+      switchBtn.textContent = '開始';
+    }
+
+    function startTurn() {
+      state.turnActive = true;
+      updateUI();
+      renderQuestion();
+      if (state.timerId) clearInterval(state.timerId);
+      state.timerId = setInterval(() => {
+        const player = state.players[state.currentPlayer];
+        player.timer -= 1;
+        timerValue1.textContent = String(state.players[0].timer).padStart(2, '0');
+        timerValue2.textContent = String(state.players[1].timer).padStart(2, '0');
+        if (player.timer <= 0) {
+          clearInterval(state.timerId);
+          state.turnActive = false;
+          showSwitchScreen();
+        }
+      }, 1000);
+    }
+
+    function showSwitchScreen() {
+      gameScreen.classList.add('hidden');
+      switchScreen.classList.remove('hidden');
+      const current = state.currentPlayer;
+      if (current === 0) {
+        switchTitle.textContent = '時間到！換玩家 2';
+        switchBody.textContent = `${state.players[0].name} 的 30 秒已結束，現在由 ${state.players[1].name} 接續。`;
+        switchBtn.textContent = '準備好，開始！';
+      } else {
+        switchTitle.textContent = '遊戲結束！';
+        switchBody.textContent = `${state.players[1].name} 的時間結束，準備查看最終結果。`;
+        switchBtn.textContent = '看結果';
+      }
+    }
+
+    function renderQuestion() {
+      promptBox.classList.add('hidden');
+      feedback.classList.add('hidden');
+      nextBtn.classList.add('hidden');
+      streakNotice.classList.add('hidden');
+      const question = state.questionOrder[state.questionIndex];
+      sectionTag.textContent = question.section;
+      questionText.textContent = question.question;
+      choices.innerHTML = '';
+      choices.classList.remove('hidden');
+      state.awaitingNext = false;
+      question.choices.forEach((choice, idx) => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'choice-btn btn-secondary';
+        btn.textContent = String.fromCharCode(65 + idx) + '. ' + choice;
+        btn.addEventListener('click', () => handleAnswer(idx));
+        choices.appendChild(btn);
+      });
+    }
+
+    function showFeedback({correct, question, selected}) {
+      feedback.innerHTML = '';
+      feedback.classList.remove('hidden');
+      if (correct) {
+        const strong = document.createElement('strong');
+        strong.textContent = '答對！自動進入下一題...';
+        feedback.appendChild(strong);
+      } else {
+        const strong = document.createElement('strong');
+        strong.textContent = '答錯了，請閱讀解說後點「下一題」繼續。';
+        const para = document.createElement('p');
+        para.className = 'explanation';
+        para.textContent = question.explanation;
+        feedback.appendChild(strong);
+        feedback.appendChild(para);
+      }
+    }
+
+    function handleAnswer(selectedIndex) {
+      if (state.awaitingNext || !state.turnActive) return;
+      const current = state.currentPlayer;
+      const player = state.players[current];
+      const question = state.questionOrder[state.questionIndex];
+      const correct = selectedIndex === question.answer;
+      player.total += 1;
+      if (correct) {
+        player.correct += 1;
+        player.score += 10;
+        player.streak += 1;
+        player.maxStreak = Math.max(player.maxStreak, player.streak);
+      } else {
+        player.streak = 0;
+      }
+      const sectionStats = player.sectionStats[question.section] || {correct: 0, total: 0};
+      sectionStats.total += 1;
+      if (correct) sectionStats.correct += 1;
+      player.sectionStats[question.section] = sectionStats;
+      player.details.push({
+        section: question.section,
+        question: question.question,
+        selected: question.choices[selectedIndex],
+        correctAnswer: question.choices[question.answer],
+        correct,
+        explanation: question.explanation
+      });
+      highlightChoices(selectedIndex, question.answer);
+      if (correct) {
+        showFeedback({correct: true});
+        if (player.streak >= 3) {
+          streakNotice.classList.remove('hidden');
+          streakText.textContent = `${player.name} 已連答 ${player.streak} 題！`;
+        }
+        state.awaitingNext = true;
+        setTimeout(() => {
+          if (!state.awaitingNext) return;
+          state.questionIndex += 1;
+          nextQuestionOrEndTurn();
+        }, 450);
+      } else {
+        showFeedback({correct: false, question});
+        nextBtn.classList.remove('hidden');
+        state.awaitingNext = true;
+      }
+    }
+
+    function highlightChoices(selected, answerIndex) {
+      Array.from(choices.children).forEach((btn, idx) => {
+        btn.disabled = true;
+        if (idx === answerIndex) btn.classList.add('correct');
+        if (idx === selected && idx !== answerIndex) btn.classList.add('wrong');
+      });
+    }
+
+    function nextQuestionOrEndTurn() {
+      if (state.questionIndex >= state.questionOrder.length) {
+        clearInterval(state.timerId);
+        state.turnActive = false;
+        showSwitchScreen();
+        return;
+      }
+      renderQuestion();
+      updateUI();
+    }
+
+    nextBtn.addEventListener('click', () => {
+      if (!state.awaitingNext) return;
+      state.questionIndex += 1;
+      nextQuestionOrEndTurn();
+    });
+
+    switchBtn.addEventListener('click', () => {
+      switchScreen.classList.add('hidden');
+      if (state.currentPlayer === 0) {
+        gameScreen.classList.remove('hidden');
+        state.currentPlayer = 1;
+        startTurn();
+      } else {
+        showResults();
+      }
+    });
+
+    startBtn.addEventListener('click', () => {
+      startGame();
+    });
+
+    resetBtn.addEventListener('click', () => {
+      location.reload();
+    });
+
+    playAgainBtn.addEventListener('click', () => {
+      location.reload();
+    });
+
+    sendWrongBtn.addEventListener('click', () => {
+      const wrongs = state.players.flatMap(p => p.details.filter(d => !d.correct));
+      const prompt = `請以高二下生態系為主題，針對以下錯題提供清楚 AI 解說：\n` + wrongs.map((item, idx) => `${idx+1}. [${item.section}] ${item.question} 正確答案：${item.correctAnswer}。解析：${item.explanation}`).join('\n');
+      showPrompt(prompt);
+    });
+
+    sendWeakBtn.addEventListener('click', () => {
+      const summary = state.players.map(p => {
+        const weak = Object.entries(p.sectionStats).filter(([section, stats]) => stats.correct / stats.total < 0.6);
+        return `${p.name} 的弱點：` + (weak.length ? weak.map(([section, stats]) => `${section} (${stats.correct}/${stats.total})`).join(', ') : '無明顯弱點');
+      }).join('\n');
+      const prompt = `請幫我分析高二下生態系的弱點章節，依據以下資料提供建議：\n${summary}`;
+      showPrompt(prompt);
+    });
+
+    function showPrompt(prompt) {
+      promptContent.textContent = prompt;
+      promptBox.classList.remove('hidden');
+      console.log('sendPrompt:', prompt);
+    }
+
+    function showResults() {
+      gameScreen.classList.add('hidden');
+      switchScreen.classList.add('hidden');
+      resultScreen.classList.remove('hidden');
+      const [p1, p2] = state.players;
+      const winnerText = p1.score === p2.score ? '平手！' : `${p1.score > p2.score ? p1.name : p2.name} 獲勝！`;
+      resultTitle.textContent = `結果：${winnerText}`;
+      resultSummary.textContent = `${p1.name} ${p1.score} 分，${p2.name} ${p2.score} 分。`;
+      resultTableBody.innerHTML = '';
+      [p1, p2].forEach(p => {
+        const rate = p.total ? Math.round(p.correct / p.total * 100) : 0;
+        const row = document.createElement('tr');
+        row.innerHTML = `<td>${p.name}</td><td>${p.correct}</td><td>${p.total}</td><td>${rate}%</td><td>${p.score}</td>`;
+        resultTableBody.appendChild(row);
+      });
+      weakSectionList.innerHTML = '';
+      const useSections = Array.from(new Set([...Object.keys(p1.sectionStats), ...Object.keys(p2.sectionStats)]));
+      useSections.forEach(section => {
+        const s1 = p1.sectionStats[section] || {correct:0,total:0};
+        const s2 = p2.sectionStats[section] || {correct:0,total:0};
+        const totalCorrect = s1.correct + s2.correct;
+        const totalCount = s1.total + s2.total;
+        const rate = totalCount ? Math.round(totalCorrect / totalCount * 100) : 0;
+        const card = document.createElement('div');
+        card.className = `section-card ${rate < 60 ? 'weak' : ''}`;
+        card.innerHTML = `<div style="font-weight:700">${section}</div><div>${totalCorrect}/${totalCount} 答對</div><div>正確率 ${rate}%</div>`;
+        weakSectionList.appendChild(card);
+      });
+      detailList.innerHTML = '';
+      [p1, p2].forEach(p => {
+        const header = document.createElement('div');
+        header.className = 'detail-card';
+        header.innerHTML = `<div class="title">${p.name} 作答詳情</div><div class="label">共 ${p.details.length} 題</div>`;
+        detailList.appendChild(header);
+        p.details.forEach((item, idx) => {
+          const card = document.createElement('div');
+          card.className = 'detail-card';
+          card.innerHTML = `<div class="title">${idx + 1}. [${item.section}] ${item.question}</div>
+            <p><span class="label">您的答案：</span>${item.selected}</p>
+            <p><span class="label">正確答案：</span>${item.correctAnswer}</p>
+            <p><span class="label">結果：</span><span class="result-badge ${item.correct ? 'badge-correct' : 'badge-wrong'}">${item.correct ? '答對' : '答錯'}</span></p>
+            <p class="label">解說：</p>
+            <p>${item.explanation}</p>`;
+          detailList.appendChild(card);
+        });
+      });
+    }
+
+    startGame();
+  </script>
+</body>
+</html>
