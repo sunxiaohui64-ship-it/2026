@@ -486,8 +486,12 @@
         }, 450);
       } else {
         showFeedback({correct: false, question});
-        nextBtn.classList.remove('hidden');
         state.awaitingNext = true;
+        setTimeout(() => {
+          if (!state.awaitingNext || !state.turnActive) return;
+          player.questionIndex += 1;
+          nextQuestionOrEndTurn();
+        }, 1500);
       }
     }
 
