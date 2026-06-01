@@ -154,7 +154,7 @@
   <main class="page">
     <section id="startScreen" class="card">
       <h1>高二下生物・生態系雙人搶答對戰</h1>
-      <p>輸入雙方名字後開始，先作答者為玩家1。每人 60 秒，答對自動下一題，答錯顯示解說後手動繼續。</p>
+      <p>輸入雙方名字後開始，先作答者為玩家1。每人 60 秒，固定 20 題，答對自動下一題，答錯顯示解說後手動繼續。</p>
       <div class="input-row">
         <div>
           <label for="player1Name">玩家 1 名字</label>
@@ -329,9 +329,10 @@
     const shuffle = arr => arr.slice().sort(() => Math.random() - 0.5);
 
     function resetState() {
+      const pool = shuffle(questions);
       state.players = [
-        {name: '', timer: 60, correct: 0, total: 0, score: 0, streak: 0, maxStreak: 0, sectionStats: {}, details: [], questionOrder: shuffle(questions), questionIndex: 0},
-        {name: '', timer: 60, correct: 0, total: 0, score: 0, streak: 0, maxStreak: 0, sectionStats: {}, details: [], questionOrder: shuffle(questions), questionIndex: 0}
+        {name: '', timer: 60, correct: 0, total: 0, score: 0, streak: 0, maxStreak: 0, sectionStats: {}, details: [], questionOrder: pool.slice(0, 20), questionIndex: 0},
+        {name: '', timer: 60, correct: 0, total: 0, score: 0, streak: 0, maxStreak: 0, sectionStats: {}, details: [], questionOrder: pool.slice(8, 28), questionIndex: 0}
       ];
       state.currentPlayer = null;
       state.turnActive = false;
@@ -593,17 +594,17 @@
         weakSectionList.appendChild(card);
       });
       detailList.innerHTML = '';
-      [p1, p2].forEach(p => {
+      [p1, p2].forEach((p, playerIndex) => {
         const header = document.createElement('div');
         header.className = 'detail-card';
-        header.innerHTML = `<div class="title">${p.name} 作答詳情</div><div class="label">共 ${p.details.length} 題</div>`;
+        header.innerHTML = `<div class="title">玩家 ${playerIndex + 1}：${p.name} 作答詳情</div><div class="label">共 ${p.details.length} 題</div>`;
         detailList.appendChild(header);
         p.details.forEach((item, idx) => {
           const card = document.createElement('div');
           card.className = 'detail-card';
           card.innerHTML = `<div class="title">${idx + 1}. [${item.section}] ${item.question}</div>
-            <p><span class="label">您的答案：</span>${item.selected}</p>
-            <p><span class="label">正確答案：</span>${item.correctAnswer}</p>
+            <p><span class="label">玩家 ${playerIndex + 1} 的答案：</span>${item.selected}</p>
+            <p><span class="label">玩家 ${playerIndex + 1} 的正確答案：</span>${item.correctAnswer}</p>
             <p><span class="label">結果：</span><span class="result-badge ${item.correct ? 'badge-correct' : 'badge-wrong'}">${item.correct ? '答對' : '答錯'}</span></p>
             <p class="label">解說：</p>
             <p>${item.explanation}</p>`;
