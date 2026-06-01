@@ -282,12 +282,10 @@
 
     const state = {
       players: [
-        {name: '', timer: 60, correct: 0, total: 0, score: 0, streak: 0, maxStreak: 0, sectionStats: {}, details: []},
-        {name: '', timer: 60, correct: 0, total: 0, score: 0, streak: 0, maxStreak: 0, sectionStats: {}, details: []}
+        {name: '', timer: 60, correct: 0, total: 0, score: 0, streak: 0, maxStreak: 0, sectionStats: {}, details: [], questionOrder: [], questionIndex: 0},
+        {name: '', timer: 60, correct: 0, total: 0, score: 0, streak: 0, maxStreak: 0, sectionStats: {}, details: [], questionOrder: [], questionIndex: 0}
       ],
-      currentPlayer: 0,
-      questionOrder: [],
-      questionIndex: 0,
+      currentPlayer: null,
       turnActive: false,
       timerId: null,
       awaitingNext: false,
@@ -332,12 +330,10 @@
 
     function resetState() {
       state.players = [
-        {name: '', timer: 60, correct: 0, total: 0, score: 0, streak: 0, maxStreak: 0, sectionStats: {}, details: []},
-        {name: '', timer: 60, correct: 0, total: 0, score: 0, streak: 0, maxStreak: 0, sectionStats: {}, details: []}
+        {name: '', timer: 60, correct: 0, total: 0, score: 0, streak: 0, maxStreak: 0, sectionStats: {}, details: [], questionOrder: shuffle(questions), questionIndex: 0},
+        {name: '', timer: 60, correct: 0, total: 0, score: 0, streak: 0, maxStreak: 0, sectionStats: {}, details: [], questionOrder: shuffle(questions), questionIndex: 0}
       ];
-      state.currentPlayer = 0;
-      state.questionOrder = shuffle(questions);
-      state.questionIndex = 0;
+      state.currentPlayer = null;
       state.turnActive = false;
       state.awaitingNext = false;
       if (state.timerId) clearInterval(state.timerId);
@@ -349,7 +345,14 @@
       timerValue2.textContent = String(state.players[1].timer).padStart(2, '0');
       timerBox1.classList.toggle('active', state.currentPlayer === 0 && state.turnActive);
       timerBox2.classList.toggle('active', state.currentPlayer === 1 && state.turnActive);
-      gameStage.textContent = state.turnActive ? `第 ${state.questionIndex + 1} 題：${state.players[state.currentPlayer].name} 作答` : `等待中：${state.players[state.currentPlayer].name}`;
+      if (state.turnActive && state.currentPlayer !== null) {
+        const player = state.players[state.currentPlayer];
+        gameStage.textContent = `第 ${player.questionIndex + 1} 題：${player.name} 作答`;
+      } else if (state.currentPlayer === null) {
+        gameStage.textContent = '準備中，按開始鍵開始遊戲';
+      } else {
+        gameStage.textContent = `等待中：${state.players[state.currentPlayer].name}`;
+      }
     }
 
     function startGame() {
@@ -405,7 +408,8 @@
       feedback.classList.add('hidden');
       nextBtn.classList.add('hidden');
       streakNotice.classList.add('hidden');
-      const question = state.questionOrder[state.questionIndex];
+      const player = state.players[state.currentPlayer];
+      const question = player.questionOrder[player.questionIndex];
       sectionTag.textContent = question.section;
       questionText.textContent = question.question;
       choices.innerHTML = '';
@@ -443,7 +447,7 @@
       if (state.awaitingNext || !state.turnActive) return;
       const current = state.currentPlayer;
       const player = state.players[current];
-      const question = state.questionOrder[state.questionIndex];
+      const question = player.questionOrder[player.questionIndex];
       const correct = selectedIndex === question.answer;
       player.total += 1;
       if (correct) {
@@ -475,8 +479,8 @@
         }
         state.awaitingNext = true;
         setTimeout(() => {
-          if (!state.awaitingNext) return;
-          state.questionIndex += 1;
+          if (!state.awaitingNext || !state.turnActive) return;
+          player.questionIndex += 1;
           nextQuestionOrEndTurn();
         }, 450);
       } else {
@@ -495,7 +499,8 @@
     }
 
     function nextQuestionOrEndTurn() {
-      if (state.questionIndex >= state.questionOrder.length) {
+      const player = state.players[state.currentPlayer];
+      if (player.questionIndex >= player.questionOrder.length) {
         clearInterval(state.timerId);
         state.turnActive = false;
         showSwitchScreen();
@@ -507,15 +512,19 @@
 
     nextBtn.addEventListener('click', () => {
       if (!state.awaitingNext) return;
-      state.questionIndex += 1;
+      state.players[state.currentPlayer].questionIndex += 1;
       nextQuestionOrEndTurn();
     });
 
     switchBtn.addEventListener('click', () => {
       switchScreen.classList.add('hidden');
-      if (state.currentPlayer === 0) {
+      if (state.currentPlayer === null) {
+        state.currentPlayer = 0;
         gameScreen.classList.remove('hidden');
+        startTurn();
+      } else if (state.currentPlayer === 0) {
         state.currentPlayer = 1;
+        gameScreen.classList.remove('hidden');
         startTurn();
       } else {
         showResults();
@@ -560,9 +569,9 @@
       switchScreen.classList.add('hidden');
       resultScreen.classList.remove('hidden');
       const [p1, p2] = state.players;
-      const winnerText = p1.score === p2.score ? '平手！' : `${p1.score > p2.score ? p1.name : p2.name} 獲勝！`;
+      const winnerText = p1.correct === p2.correct ? '平手！' : `${p1.correct > p2.correct ? p1.name : p2.name} 獲勝！`;
       resultTitle.textContent = `結果：${winnerText}`;
-      resultSummary.textContent = `${p1.name} ${p1.score} 分，${p2.name} ${p2.score} 分。`;
+      resultSummary.textContent = `${p1.name} 答對 ${p1.correct} 題 (${p1.score} 分)，${p2.name} 答對 ${p2.correct} 題 (${p2.score} 分)。`;
       resultTableBody.innerHTML = '';
       [p1, p2].forEach(p => {
         const rate = p.total ? Math.round(p.correct / p.total * 100) : 0;
@@ -603,7 +612,6 @@
       });
     }
 
-    startGame();
   </script>
 </body>
 </html>
