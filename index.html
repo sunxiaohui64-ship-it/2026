@@ -193,7 +193,6 @@
         <div class="question-text" id="questionText"></div>
         <div class="choices" id="choices"></div>
         <div id="feedback" class="feedback hidden"></div>
-        <button id="nextBtn" class="btn-warning hidden">下一題</button>
         <div class="notice hidden" id="streakNotice"><span>🔥</span><span id="streakText"></span></div>
       </div>
     </section>
@@ -311,7 +310,6 @@
     const questionText = el('questionText');
     const choices = el('choices');
     const feedback = el('feedback');
-    const nextBtn = el('nextBtn');
     const streakNotice = el('streakNotice');
     const streakText = el('streakText');
     const switchTitle = el('switchTitle');
@@ -407,7 +405,6 @@
     function renderQuestion() {
       promptBox.classList.add('hidden');
       feedback.classList.add('hidden');
-      nextBtn.classList.add('hidden');
       streakNotice.classList.add('hidden');
       const player = state.players[state.currentPlayer];
       const question = player.questionOrder[player.questionIndex];
@@ -515,11 +512,6 @@
       updateUI();
     }
 
-    nextBtn.addEventListener('click', () => {
-      if (!state.awaitingNext) return;
-      state.players[state.currentPlayer].questionIndex += 1;
-      nextQuestionOrEndTurn();
-    });
 
     switchBtn.addEventListener('click', () => {
       switchScreen.classList.add('hidden');
