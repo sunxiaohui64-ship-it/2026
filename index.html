@@ -154,7 +154,7 @@
   <main class="page">
     <section id="startScreen" class="card">
       <h1>高二下生物・生態系雙人搶答對戰</h1>
-      <p>輸入雙方名字後開始，先作答者為玩家1。每人 60 秒，固定 20 題，答對自動下一題，答錯顯示解說後自動繼續。</p>
+      <p>輸入雙方名字後開始，先作答者為玩家1。每人 60 秒，固定 20 題，答對自動下一題，答錯不立即顯示解說，最後再呈現全部錯題詳解。</p>
       <div class="input-row">
         <div>
           <label for="player1Name">玩家 1 名字</label>
@@ -172,7 +172,7 @@
       <div class="detail-row">
         <div>
           <h2 id="gameStage">第 1 回合：玩家1作答</h2>
-          <p id="gameHint">回答完後立即自動進入下一題，無需手動切換。</p>
+          <p id="gameHint">回答完後立即自動進入下一題，錯誤解說會在最終結果頁面一次呈現。</p>
         </div>
         <button id="resetBtn" class="btn-secondary">重新開始</button>
       </div>
@@ -432,12 +432,8 @@
         feedback.appendChild(strong);
       } else {
         const strong = document.createElement('strong');
-        strong.textContent = '答錯了，稍後會自動進入下一題，請閱讀解說。';
-        const para = document.createElement('p');
-        para.className = 'explanation';
-        para.textContent = question.explanation;
+        strong.textContent = '答錯了，將自動進入下一題。';
         feedback.appendChild(strong);
-        feedback.appendChild(para);
       }
     }
 
