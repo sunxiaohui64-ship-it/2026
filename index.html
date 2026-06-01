@@ -343,9 +343,11 @@
       const pool = shuffle(questions);
       state.players = [
         {name: '', timer: 60, correct: 0, total: 0, score: 0, streak: 0, maxStreak: 0, sectionStats: {}, details: [], questionOrder: pool.slice(0, 20), questionIndex: 0},
-        {name: '', timer: 60, correct: 0, total: 0, score: 0, streak: 0, maxStreak: 0, sectionStats: {}, details: [], questionOrder: pool.slice(8, 28), questionIndex: 0}
+        {name: '', timer: 60, correct: 0, total: 0, score: 0, streak: 0, maxStreak: 0, sectionStats: {}, details: [], questionOrder: pool.slice(20, 40), questionIndex: 0}
       ];
-      state.currentPlayer = null;      state.currentQuestion = null;      state.turnActive = false;
+      state.currentPlayer = null;
+      state.currentQuestion = null;
+      state.turnActive = false;
       state.awaitingNext = false;
       if (state.timerId) clearInterval(state.timerId);
       updateUI();
