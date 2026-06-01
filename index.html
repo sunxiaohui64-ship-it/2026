@@ -285,6 +285,7 @@
         {name: '', timer: 60, correct: 0, total: 0, score: 0, streak: 0, maxStreak: 0, sectionStats: {}, details: [], questionOrder: [], questionIndex: 0}
       ],
       currentPlayer: null,
+      currentQuestion: null,
       turnActive: false,
       timerId: null,
       awaitingNext: false,
@@ -332,8 +333,7 @@
         {name: '', timer: 60, correct: 0, total: 0, score: 0, streak: 0, maxStreak: 0, sectionStats: {}, details: [], questionOrder: pool.slice(0, 20), questionIndex: 0},
         {name: '', timer: 60, correct: 0, total: 0, score: 0, streak: 0, maxStreak: 0, sectionStats: {}, details: [], questionOrder: pool.slice(8, 28), questionIndex: 0}
       ];
-      state.currentPlayer = null;
-      state.turnActive = false;
+      state.currentPlayer = null;      state.currentQuestion = null;      state.turnActive = false;
       state.awaitingNext = false;
       if (state.timerId) clearInterval(state.timerId);
       updateUI();
@@ -402,12 +402,26 @@
       }
     }
 
+    function getShuffledQuestion(question) {
+      const indexed = question.choices.map((choice, idx) => ({choice, idx}));
+      const shuffled = shuffle(indexed);
+      const answer = shuffled.findIndex(item => item.idx === question.answer);
+      return {
+        section: question.section,
+        question: question.question,
+        choices: shuffled.map(item => item.choice),
+        answer,
+        explanation: question.explanation
+      };
+    }
+
     function renderQuestion() {
       promptBox.classList.add('hidden');
       feedback.classList.add('hidden');
       streakNotice.classList.add('hidden');
       const player = state.players[state.currentPlayer];
-      const question = player.questionOrder[player.questionIndex];
+      const question = getShuffledQuestion(player.questionOrder[player.questionIndex]);
+      state.currentQuestion = question;
       sectionTag.textContent = question.section;
       questionText.textContent = question.question;
       choices.innerHTML = '';
@@ -441,7 +455,7 @@
       if (state.awaitingNext || !state.turnActive) return;
       const current = state.currentPlayer;
       const player = state.players[current];
-      const question = player.questionOrder[player.questionIndex];
+      const question = state.currentQuestion;
       const correct = selectedIndex === question.answer;
       player.total += 1;
       if (correct) {
