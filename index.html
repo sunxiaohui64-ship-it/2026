@@ -172,7 +172,7 @@
       <div class="detail-row">
         <div>
           <h2 id="gameStage">第 1 回合：玩家1作答</h2>
-          <p id="gameHint">答對將在 0.45 秒後自動切題，答錯會顯示解說後點「下一題」。</p>
+          <p id="gameHint">答對或答錯皆會自動在短暫顯示解說後進入下一題。</p>
         </div>
         <button id="resetBtn" class="btn-secondary">重新開始</button>
       </div>
@@ -435,7 +435,7 @@
         feedback.appendChild(strong);
       } else {
         const strong = document.createElement('strong');
-        strong.textContent = '答錯了，請閱讀解說後點「下一題」繼續。';
+        strong.textContent = '答錯了，稍後會自動進入下一題，請閱讀解說。';
         const para = document.createElement('p');
         para.className = 'explanation';
         para.textContent = question.explanation;
